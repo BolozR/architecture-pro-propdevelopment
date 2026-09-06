@@ -1,0 +1,89 @@
+[
+  {
+    "stage": "ResponseComplete",
+    "user": {
+      "username": "system:serviceaccount:secure-ops:monitoring",
+      "groups": ["system:serviceaccounts", "system:serviceaccounts:secure-ops"]
+    },
+    "verb": "get",
+    "requestURI": "/api/v1/namespaces/kube-system/secrets/example-secret",
+    "objectRef": {
+      "resource": "secrets",
+      "namespace": "kube-system",
+      "name": "example-secret"
+    },
+    "responseStatus": {
+      "code": 403
+    }
+  },
+  {
+    "stage": "ResponseComplete",
+    "user": {
+      "username": "minikube-user"
+    },
+    "verb": "create",
+    "requestURI": "/api/v1/namespaces/secure-ops/pods",
+    "objectRef": {
+      "resource": "pods",
+      "namespace": "secure-ops",
+      "name": "privileged-pod"
+    },
+    "requestObject": {
+      "spec": {
+        "containers": [
+          {
+            "name": "pwn",
+            "securityContext": {
+              "privileged": true
+            }
+          }
+        ]
+      }
+    },
+    "responseStatus": {
+      "code": 201
+    }
+  },
+  {
+    "stage": "ResponseComplete",
+    "user": {
+      "username": "minikube-user"
+    },
+    "verb": "create",
+    "requestURI": "/api/v1/namespaces/kube-system/pods/coredns-example/exec",
+    "objectRef": {
+      "resource": "pods",
+      "subresource": "exec",
+      "namespace": "kube-system",
+      "name": "coredns-example"
+    },
+    "responseStatus": {
+      "code": 101
+    }
+  },
+  {
+    "stage": "ResponseComplete",
+    "user": {
+      "username": "minikube-user"
+    },
+    "verb": "create",
+    "requestURI": "/apis/rbac.authorization.k8s.io/v1/namespaces/secure-ops/rolebindings",
+    "objectRef": {
+      "apiGroup": "rbac.authorization.k8s.io",
+      "resource": "rolebindings",
+      "namespace": "secure-ops",
+      "name": "escalate-binding"
+    },
+    "requestObject": {
+      "roleRef": {
+        "kind": "ClusterRole",
+        "name": "cluster-admin",
+        "apiGroup": "rbac.authorization.k8s.io"
+      }
+    },
+    "responseStatus": {
+      "code": 201
+    }
+  }
+]
+
